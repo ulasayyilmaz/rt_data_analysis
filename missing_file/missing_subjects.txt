@@ -1,0 +1,76 @@
+
+Missing Subjects for motorSelectiveStop_glm
+Task directory missing: /Users/ibrayyilmaz/Desktop/EnkaviLab/practice_code/rt_data_analysis/derivatives/motorSelectiveStop_glm
+
+Missing Subjects for stopSignal_glm
+Task directory missing: /Users/ibrayyilmaz/Desktop/EnkaviLab/practice_code/rt_data_analysis/derivatives/stopSignal_glm
+
+Missing Subjects for discountFix_glm
+Task directory missing: /Users/ibrayyilmaz/Desktop/EnkaviLab/practice_code/rt_data_analysis/derivatives/discountFix_glm
+
+Missing Subjects for stroop_glm
+sub-s586_missing_for_stroop_glm
+sub-s172_missing_for_stroop_glm
+sub-s518_missing_for_stroop_glm
+sub-s587_missing_for_stroop_glm
+sub-s591_missing_for_stroop_glm
+sub-s613_missing_for_stroop_glm
+sub-s640_missing_for_stroop_glm
+sub-s647_missing_for_stroop_glm
+sub-s597_missing_for_stroop_glm
+sub-s648_missing_for_stroop_glm
+sub-s601_missing_for_stroop_glm
+sub-s606_missing_for_stroop_glm
+sub-s608_missing_for_stroop_glm
+sub-s590_missing_for_stroop_glm
+sub-s609_missing_for_stroop_glm
+sub-s631_missing_for_stroop_glm
+sub-s607_missing_for_stroop_glm
+sub-s600_missing_for_stroop_glm
+sub-s585_missing_for_stroop_glm
+sub-s599_missing_for_stroop_glm
+sub-s582_missing_for_stroop_glm
+sub-s549_missing_for_stroop_glm
+sub-s373_missing_for_stroop_glm
+sub-s513_missing_for_stroop_glm
+sub-s548_missing_for_stroop_glm
+sub-s584_missing_for_stroop_glm
+sub-s546_missing_for_stroop_glm
+sub-s579_missing_for_stroop_glm
+sub-s541_missing_for_stroop_glm
+sub-s512_missing_for_stroop_glm
+sub-s558_missing_for_stroop_glm
+sub-s593_missing_for_stroop_glm
+sub-s567_missing_for_stroop_glm
+sub-s594_missing_for_stroop_glm
+sub-s556_missing_for_stroop_glm
+sub-s568_missing_for_stroop_glm
+sub-s557_missing_for_stroop_glm
+sub-s595_missing_for_stroop_glm
+sub-s561_missing_for_stroop_glm
+sub-s643_missing_for_stroop_glm
+sub-s626_missing_for_stroop_glm
+sub-s619_missing_for_stroop_glm
+sub-s617_missing_for_stroop_glm
+sub-s610_missing_for_stroop_glm
+sub-s645_missing_for_stroop_glm
+sub-s616_missing_for_stroop_glm
+sub-s627_missing_for_stroop_glm
+sub-s499_missing_for_stroop_glm
+sub-s635_missing_for_stroop_glm
+sub-s603_missing_for_stroop_glm
+sub-s234_missing_for_stroop_glm
+sub-s519_missing_for_stroop_glm
+sub-s553_missing_for_stroop_glm
+
+Missing Subjects for CCTHot_glm
+Task directory missing: /Users/ibrayyilmaz/Desktop/EnkaviLab/practice_code/rt_data_analysis/derivatives/CCTHot_glm
+
+Missing Subjects for WATT3_glm
+Task directory missing: /Users/ibrayyilmaz/Desktop/EnkaviLab/practice_code/rt_data_analysis/derivatives/WATT3_glm
+
+Missing Subjects for DPX_glm
+Task directory missing: /Users/ibrayyilmaz/Desktop/EnkaviLab/practice_code/rt_data_analysis/derivatives/DPX_glm
+
+Missing Subjects for twoByTwo_glm
+Task directory missing: /Users/ibrayyilmaz/Desktop/EnkaviLab/practice_code/rt_data_analysis/derivatives/twoByTwo_glm

@@ -75,11 +75,11 @@ def define_nuisance_trials(events_df, task):
         too_fast, omission, commission: indicators for each junk trial type
     """
     if task in ['ANT', 'DPX', 'stroop']:
-        omission = (events_df.key_press == -1)
-        commission = ((events_df.key_press != events_df.correct_response) &
-                      (events_df.key_press != -1) &
-                      (events_df.response_time >= .2))
-        too_fast = (events_df.response_time < .2) 
+        omission = (events_df.key_press == -1) # key not pressed
+        commission = ((events_df.key_press != events_df.correct_response) & #wrong key pressed
+                      (events_df.key_press != -1) & #any key pressed
+                      (events_df.response_time >= .2)) #response time longer 
+        too_fast = (events_df.response_time < .2)  
     if task in ['twoByTwo']:
         omission = (events_df.key_press == -1)
         commission = ((events_df.key_press != events_df.correct_response) &
@@ -136,8 +136,8 @@ def make_basic_stroop_desmat(
     events_df = pd.read_csv(events_file, sep = '\t')
     events_df, percent_junk =  define_nuisance_trials(events_df, 'stroop')
     events_df['constant_1_column'] = 1 
-    events_df['incongruent'] = 0
-    events_df.loc[events_df.trial_type == 'incongruent', 'incongruent'] = 1
+    events_df['incongruent'] = 0 # set new column to all 0's
+    events_df.loc[events_df.trial_type == 'incongruent', 'incongruent'] = 1 #find trial_type==incongruent, and set new column to 1's
     events_df['congruent'] = 0
     events_df.loc[events_df.trial_type == 'congruent', 'congruent'] = 1
     subset_main_regressors = 'too_fast == 0 and commission == 0 and omission == 0 and onset > 0' 
@@ -297,7 +297,7 @@ def make_basic_ant_desmat(events_file, add_deriv,
                 #'task': 'task'#
                 }
     if regress_rt == 'rt_centered':
-        mn_rt = events_df.query(rt_subset)['response_time'].mean()
+        mn_rt = events_df['response_time'].mean()
         events_df['response_time_centered'] = events_df.response_time - mn_rt
         rt = make_regressor_and_derivative(
         n_scans=n_scans, tr=tr, events_df=events_df, add_deriv = add_deriv,
@@ -356,7 +356,7 @@ def make_basic_ccthot_desmat(events_file, add_deriv, regress_rt,
             # Note, this automatically excludes the ITI row
         trial_durs.append(
             events_df.iloc[start_idx:end_idx]
-                            ['block_duration'].sum()
+                            ['duration'].sum()
         )
     events_df['trial_duration'] = np.nan
     events_df.loc[start_round_idx, 'trial_duration'] = trial_durs
@@ -379,7 +379,8 @@ def make_basic_ccthot_desmat(events_file, add_deriv, regress_rt,
         n_scans=n_scans, tr=tr, events_df=events_df, add_deriv = add_deriv,
         amplitude_column="absolute_loss_amount", duration_column="constant_1_column",
         onset_column='button_onset',
-        subset="action=='draw_card' and feedback==0 and onset > 0", demean_amp=True, 
+        # subset="action=='draw_card' and feedback==0 and onset > 0", demean_amp=True, 
+        subset="action=='draw_card' and trial_id!='feedback' and onset > 0", demean_amp=True, 
         cond_id='negative_draw'
     )
     trial_gain = make_regressor_and_derivative(
@@ -523,11 +524,14 @@ def make_basic_two_by_two_desmat(events_file, add_deriv,
     subset_main_regressors = ('too_fast == 0 and commission == 0 and '
                             'omission == 0 and onset > 0')
     events_df['constant_1_column'] = 1  
-    events_df.trial_type = ['cue_'+c if c is not np.nan else 'task_'+t
+    events_df["trial_type"] = ['cue_'+c if c is not np.nan else 'task_'+t
                             for c, t in zip(events_df.cue_switch,
                                             events_df.task_switch)]
-    events_df.trial_type.replace('cue_switch', 'task_stay_cue_switch',
-                                inplace=True)
+    events_trial_list=events_df.trial_type
+    for i in range(len(events_trial_list)):
+        if events_trial_list[i]=='cue_switch':
+            events_trial_list[i]='task_stay_cue_switch'
+    events_df.trial_type=events_trial_list
 
     too_fast_regressor = make_regressor_and_derivative(
             n_scans=n_scans, tr=tr, events_df=events_df, add_deriv = add_deriv,
@@ -642,6 +646,7 @@ def make_basic_watt3_desmat(events_file, add_deriv, regress_rt,
               rt regressors are requeset.
     """
     events_df = pd.read_csv(events_file, sep = '\t')
+    # print("events_df columns:", events_df.columns)
     #no junk trial definition for this task
     percent_junk = 0
     events_df['constant_1_column'] = 1  
@@ -651,7 +656,7 @@ def make_basic_watt3_desmat(events_file, add_deriv, regress_rt,
         events_df.condition.str.split(expand=True, pat='_')
     events_df.with_without = events_df.with_without.replace('without', -1)
     events_df.with_without = events_df.with_without.replace('with', 1)
-    events_df.block_duration = events_df.block_duration/1000
+    events_df["block_duration"] = events_df.duration/1000
  
     planning_event = make_regressor_and_derivative(
         n_scans=n_scans, tr=tr, events_df=events_df, add_deriv = add_deriv,

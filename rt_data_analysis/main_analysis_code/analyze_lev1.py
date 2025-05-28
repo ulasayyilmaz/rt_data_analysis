@@ -3,11 +3,12 @@
 import glob
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import json
 import sys
 import os
 from argparse import ArgumentParser, RawTextHelpFormatter
-from utils_lev1.qa import update_excluded_subject_csv, qa_design_matrix, add_to_html_summary
+from utils_lev1.qa import update_excluded_subject_csv, qa_design_matrix, add_to_html_summary, add_to_csv
 
 
 def get_confounds_aroma_nonaggr_data(confounds_file):
@@ -134,6 +135,9 @@ def get_files(root, subid, task):
     """    
     files = {}
     file_missing = {}
+    print(root)
+    print(subid)
+    print(task)
     file_missing['subid_task'] = f'{subid}_{task}'
     files['events_file'], file_missing['event_file_missing'] = check_file(glob.glob(
         f'{root}/sub-s{subid}/ses-[0-9]/func/*{task}*tsv'
@@ -150,7 +154,9 @@ def get_files(root, subid, task):
     f'{root}/derivatives/fmriprep/sub-s{subid}/ses-[0-9]/func/*{task}*AROMA*_bold.nii.gz'
     ))
     file_missing = pd.DataFrame(file_missing)
-    if file_missing.loc[:, file_missing.columns != 'subid_task'].gt(0).any(1).bool():
+    # file_missing
+    print(file_missing.loc[:, file_missing.columns != 'subid_task'])
+    if file_missing.loc[:, file_missing.columns != 'subid_task'].gt(0).any(axis=1).bool():
         update_excluded_subject_csv(file_missing, subid, task, contrast_dir)
         print(f'Subject {subid}, task: {task} is missing one or more input data files.')
         sys.exit(0)
@@ -195,7 +201,7 @@ def get_parser():
     )
     return parser
 
-
+# set up to run level 1 for 1 sub
 if __name__ == "__main__":
     from nilearn.glm.first_level import FirstLevelModel
     opts = get_parser().parse_args(sys.argv[1:])
@@ -208,21 +214,27 @@ if __name__ == "__main__":
     else:
         add_deriv = 'deriv_yes'
     
-    outdir = (f'/oak/stanford/groups/russpold/data/uh2/aim1_mumford/'
-        f'output/{task}_lev1_output/')
-    root = '/oak/stanford/groups/russpold/data/uh2/aim1/BIDS'
-    contrast_dir = (f'{outdir}/task_{task}_rtmodel_{regress_rt}')
+    # defaulting everything to ses-1
+    # outdir = (f'/Users/ibrayyilmaz/Desktop/EnkaviLab/practice_code/ds004636/derivatives/{task}_glm/sub-s{subid}')
+    # root = '/Users/ibrayyilmaz/Desktop/EnkaviLab/practice_code/ds004636'
+    
+    outdir = (f'/hopper/groups/enkavilab/data/ds004636/derivatives/{task}_glm/sub-s{subid}')
+    root = '/hopper/groups/enkavilab/data/ds004636'
+    
+    contrast_dir = (f'{outdir}/{regress_rt}')
     if not os.path.exists(contrast_dir):
         os.makedirs(outdir, exist_ok=True)
         os.makedirs(f'{contrast_dir}/contrast_estimates')
-
     files = get_files(root, subid, task)
-
     n_scans = get_nscans(files['data_file'])
     
     design_matrix, contrasts, percent_junk, percent_high_motion, tr = make_desmat_contrasts(root, task, 
         files['events_file'], add_deriv, n_scans, files['confounds_file'], regress_rt
     )
+    print(design_matrix)
+    sns.heatmap(design_matrix, cmap="coolwarm")
+    
+    # plot design matrix
     design_matrix['constant'] = 1
     design_matrix.drop(columns=['csf', 'white_matter'], inplace=True)
 
@@ -234,7 +246,9 @@ if __name__ == "__main__":
     add_to_html_summary(subid, contrasts, design_matrix, contrast_dir, 
             regress_rt, task, any_fail, exclusion)
 
-
+    add_to_csv(subid, contrasts, design_matrix, contrast_dir, 
+            regress_rt, task, any_fail, exclusion)
+    
     if not any_fail and qa_only == False:
         fmri_glm = FirstLevelModel(tr,
                                     subject_label=subid,
@@ -246,9 +260,10 @@ if __name__ == "__main__":
         out = fmri_glm.fit(files['data_file'], design_matrices = design_matrix)
 
         for con_name, con in contrasts.items():
-            filename = (f'{contrast_dir}/contrast_estimates/task_{task}_contrast_{con_name}_sub_'
-                f'{subid}_rtmodel_{regress_rt}_stat'
-                f'_contrast.nii.gz')
+            print("contrast items:")
+            print(con_name)
+            # filename convention set
+            filename = (f'{contrast_dir}/contrast_estimates/sub-{subid}_ses-1_task-{task}_contrast_{con_name}_rtmodel_{regress_rt}_stat_contrast.nii.gz')
             con_est  = out.compute_contrast(con, output_type = 'effect_size')
             con_est.to_filename(filename)
 

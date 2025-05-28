@@ -17,8 +17,8 @@ def get_behav_exclusion(subid, task):
         task: task name
     output: pandas data frame with any behavioral exclusions for this subject/task
     """
-    behav_exclusion_file = ('/oak/stanford/groups/russpold/data/uh2/'
-        'aim1_mumford/rt_data_analysis/main_analysis_code/utils_lev1/aim1_beh_subject_exclusions.csv')
+    behav_exclusion_file = ('/Users/ibrayyilmaz/Desktop/EnkaviLab/practice_code/rt_data_analysis/rt_data_analysis/main_analysis_code/utils_lev1/aim1_beh_subject_exclusions.csv')
+    # behav_exclusion_file = ('/hopper/groups/enkavilab/users/ibrayyilmaz/rt_data_analysis/rt_data_analysis/main_analysis_code/utils_lev1/aim1_beh_subject_exclusions.csv')
     behav_exclusion = pd.read_csv(behav_exclusion_file)
     behav_exclusion.rename(columns={'Unnamed: 0': 'subid_task'}, inplace=True)
     behav_exclusion['subid_task'] = behav_exclusion['subid_task'].map(lambda x: x.lstrip('s'))
@@ -85,7 +85,8 @@ def qa_design_matrix(contrast_dir, contrasts, desmat, subid, task, percent_junk,
                 'task_related_regressor_all_zeros': bad_columns if any_column_fail else [0]}
     failures = pd.DataFrame(failures)
     all_exclusion = pd.merge(behav_exclusion_this_sub, failures)
-    any_fail = all_exclusion.loc[:, all_exclusion.columns != 'subid_task'].ne(0).any(1).bool()
+    all_exclusion.to_csv(f"~/{task}_exclusion.csv")
+    any_fail = all_exclusion.loc[:, all_exclusion.columns != 'subid_task'].ne(0).any(axis=1).any()
     if any_fail:
         update_excluded_subject_csv(all_exclusion, subid, task, contrast_dir)
     return all_exclusion, any_fail
@@ -193,6 +194,56 @@ def check_html_for_sub(subid, html_file):
                 already_done = True
     return already_done
 
+def add_to_csv(subid, contrasts, desmat, outdir, regress_rt, task, any_fail, exclusion):
+    """Adds VIF values to CSV. Single file per task.
+
+    Args:
+        subid: Subject ID
+        contrasts: Contrasts of interest
+        desmat: Design matrix
+        outdir: Output directory
+        regress_rt:  How RT was modeled
+        task: Task
+        any_fail: Whether any QA checks failed
+        exclusion: Pandas dataframe indicating which exclusionary criteria were met
+    Output:
+        CSV file is created
+    """
+
+    csv_task_vifs = (f'{outdir}/VIF_s{subid}_{task}_{regress_rt}.csv')
+    csv_contrasts_vifs = (f'{outdir}/VIF_contrast_s{subid}_{task}_{regress_rt}.csv')
+    csv_desmat=(f'{outdir}/desmat_s{subid}_{task}_{regress_rt}.csv')
+    csv_contrast=(f'{outdir}/contrast_matrix_s{subid}_{task}_{regress_rt}.csv')
+    csv_corr_matrix=(f'{outdir}/corr_matrix_desmat_s{subid}_{task}_{regress_rt}.csv')
+    desmat_vif = desmat
+    desmat_vif.to_csv(csv_desmat)
+
+    # vif for task
+    vif_data = est_vif(desmat_vif)
+    vif_data.to_csv(csv_task_vifs)
+
+    # vif for contrast
+    vif_contrasts = get_all_contrast_vif(desmat, contrasts)
+    vif_contrasts.to_csv(csv_contrasts_vifs)
+
+    # contrast_matrix 
+    design_column_names = desmat.columns.tolist()
+    contrast_matrix = []
+    for i, (key, values) in enumerate(contrasts.items()):
+        contrast_def = expression_to_contrast_vector(
+            values, design_column_names)
+        contrast_matrix.append(np.array(contrast_def))
+    contrast_matrix = np.asmatrix(np.asarray(contrast_matrix))
+    row_names=contrasts.keys()
+    column_names=design_column_names
+    df_contrast_matrix = pd.DataFrame(contrast_matrix, columns=column_names)
+    df_contrast_matrix.insert(0, 'Contrast', row_names)
+    df_contrast_matrix.to_csv(csv_contrast, index=False)
+
+    # correlation matrix
+    corr_matrix = desmat.corr()
+    corr_matrix.to_csv(csv_corr_matrix)
+    
 
 
 def add_to_html_summary(subid, contrasts, desmat, outdir, regress_rt, task, any_fail, exclusion):
