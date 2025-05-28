@@ -2,12 +2,13 @@ import os
 import pandas as pd
 from collections import defaultdict
 import math
+import numpy as np
 
 
 BASE_DIR = "/hopper/groups/enkavilab/data/ds004636/derivatives"
 # RT_TYPES = ["rt_centered", "rt_duration", "rt_duration_only", "rt_uncentered"]
 RT_TYPES=["rt_centered"]
-OUTPUT_DIR = "hopper/groups/enkavilab/users/ibrayyilmaz/rt_data_analysis/rt_data_analysis/main_analysis_code/avgVIF"  # saves in current working directory
+OUTPUT_DIR = "/hopper/groups/enkavilab/users/ibrayyilmaz/rt_data_analysis/rt_data_analysis/main_analysis_code/avgVIF"  # saves in current working directory
 
 def get_task_dirs(base_dir):
     return [d for d in os.listdir(base_dir) if d.endswith("_glm") and os.path.isdir(os.path.join(base_dir, d))]
@@ -31,6 +32,7 @@ def collect_vif_data(task_dir, task_name):
                         df = pd.read_csv(file_path)
                         key_col = "regressor" if "regressor" in df.columns else "contrast"
                         for _, row in df.iterrows():
+                            # for each rt_type and regressor per task, add to array a subject VIF value.
                             vif_data[rt][row[key_col]].append(float(row["VIF"]))
                     except Exception as e:
                         print(f"Error reading {file_path}: {e}")
@@ -38,7 +40,8 @@ def collect_vif_data(task_dir, task_name):
 
 def average_vifs(vif_dict):
     return {
-        k: (sum(v_i for v_i in v if not math.isnan(v_i)) / len([v_i for v_i in v if not math.isnan(v_i)]))
+        # returns key -> [VIF_avg_value, VIF_std]
+        k: [(sum(v_i for v_i in v if not math.isnan(v_i)) / len([v_i for v_i in v if not math.isnan(v_i)])),np.std(v).item()]
         for k, v in vif_dict.items()
         if any(not math.isnan(v_i) for v_i in v)
     }
