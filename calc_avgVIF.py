@@ -40,7 +40,7 @@ def collect_vif_data(task_dir, task_name):
 
 def average_vifs(vif_dict):
     return {
-        # returns key -> [VIF_avg_value, VIF_std]
+        # returns key -> [VIF_avg_value, VIF_std]   (for value and error bars)
         k: [(sum(v_i for v_i in v if not math.isnan(v_i)) / len([v_i for v_i in v if not math.isnan(v_i)])),np.std(v).item()]
         for k, v in vif_dict.items()
         if any(not math.isnan(v_i) for v_i in v)
