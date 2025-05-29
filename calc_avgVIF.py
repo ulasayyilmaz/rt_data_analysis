@@ -43,7 +43,7 @@ def average_vifs(vif_dict):
     for k, v in vif_dict.items():
         v =np.array(v)
         v_filtered = v[np.isfinite(v)]
-        v_avg=sum(v_i for v_i in v_filtered)/len(v_i for v_i in v_filtered)
+        v_avg=sum(v_filtered)/len(v_filtered)
         v_std=np.std(v_filtered)
         return {k : [v_avg,v_std]}
         
