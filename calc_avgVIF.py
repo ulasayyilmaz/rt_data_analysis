@@ -38,13 +38,16 @@ def collect_vif_data(task_dir, task_name):
                         print(f"Error reading {file_path}: {e}")
     return task_name, vif_data
 
+# updated to remove all nan and infinities
 def average_vifs(vif_dict):
-    return {
-        # returns key -> [VIF_avg_value, VIF_std]   (for value and error bars)
-        k: [(sum(v_i for v_i in v if not math.isnan(v_i)) / len([v_i for v_i in v if not math.isnan(v_i)])),np.std(v).item()]
-        for k, v in vif_dict.items()
-        if any(not math.isnan(v_i) for v_i in v)
-    }
+    for k, v in vif_dict.items():
+        v_filtered = v[np.isfinite(v)]
+        v_avg=sum(v_i for v_i in v_filtered)/len(v_i for v_i in v_filtered)
+        v_std=np.std(v_filtered)
+        return {k : [v_avg,v_std]}
+        
+        
+    
 
 def main():
     task_dirs = get_task_dirs(BASE_DIR)
