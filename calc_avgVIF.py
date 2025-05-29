@@ -6,8 +6,8 @@ import numpy as np
 
 
 BASE_DIR = "/hopper/groups/enkavilab/data/ds004636/derivatives"
-# RT_TYPES = ["rt_centered", "rt_duration", "rt_duration_only", "rt_uncentered"]
-RT_TYPES=["rt_centered"]
+RT_TYPES = ["rt_centered", "rt_duration", "rt_duration_only", "rt_uncentered"]
+# RT_TYPES=["rt_centered"]
 OUTPUT_DIR = "/hopper/groups/enkavilab/users/ibrayyilmaz/rt_data_analysis/rt_data_analysis/main_analysis_code/avgVIF"  # saves in current working directory
 
 def get_task_dirs(base_dir):
