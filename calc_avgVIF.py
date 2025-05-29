@@ -41,6 +41,7 @@ def collect_vif_data(task_dir, task_name):
 # updated to remove all nan and infinities
 def average_vifs(vif_dict):
     for k, v in vif_dict.items():
+        v =np.array(v)
         v_filtered = v[np.isfinite(v)]
         v_avg=sum(v_i for v_i in v_filtered)/len(v_i for v_i in v_filtered)
         v_std=np.std(v_filtered)
