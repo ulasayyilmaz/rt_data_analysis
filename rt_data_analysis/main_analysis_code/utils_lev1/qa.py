@@ -85,7 +85,6 @@ def qa_design_matrix(contrast_dir, contrasts, desmat, subid, task, percent_junk,
                 'task_related_regressor_all_zeros': bad_columns if any_column_fail else [0]}
     failures = pd.DataFrame(failures)
     all_exclusion = pd.merge(behav_exclusion_this_sub, failures)
-    all_exclusion.to_csv(f"~/{task}_exclusion.csv")
     any_fail = all_exclusion.loc[:, all_exclusion.columns != 'subid_task'].ne(0).any(axis=1).any()
     if any_fail:
         update_excluded_subject_csv(all_exclusion, subid, task, contrast_dir)
@@ -243,6 +242,9 @@ def add_to_csv(subid, contrasts, desmat, outdir, regress_rt, task, any_fail, exc
     # correlation matrix
     corr_matrix = desmat.corr()
     corr_matrix.to_csv(csv_corr_matrix)
+
+    # exclusion csv (any_fail=True if at least an entry is non-zero numeric)
+
     
 
 

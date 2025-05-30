@@ -249,7 +249,11 @@ if __name__ == "__main__":
     add_to_csv(subid, contrasts, design_matrix, contrast_dir, 
             regress_rt, task, any_fail, exclusion)
     
-    if not any_fail and qa_only == False:
+    exclusion.to_csv(f"{contrast_dir}/exclusion_{task}_{subid}_{regress_rt}.csv")
+
+    # if not any_fail and qa_only == False: -> delete any_fail to include ANT. any_fail is created 
+    # by checking if any entry at exclusion csv is non-zero digit. Saved in task/sub/rt directory.
+    if qa_only == False:
         fmri_glm = FirstLevelModel(tr,
                                     subject_label=subid,
                                     mask_img=files['mask_file'],
